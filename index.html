@@ -3,11 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Lottery with MetaMask SDK</title>
-    <script type="module">
-        import { MetaMaskSDK } from "@metamask/sdk";
-        import { ethers } from "ethers";  // Importing ethers.js to interact with smart contracts
+    <title>Happy</title>
+    <script src="https://unpkg.com/@metamask/sdk@latest/dist/metamask-sdk.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.0/dist/ethers.min.js"></script>
+</head>
+<body>
+    <h1>Happy</h1>
 
+    <!-- Connect Wallet Button -->
+    <button id="connectWallet">Connect Wallet</button>
+    <div id="walletAddress"></div>
+
+    <!-- Buy Tickets Section -->
+    <h2>Buy Tickets</h2>
+    <input type="number" id="ticketAmount" placeholder="Enter number of tickets">
+    <button id="buyTicketsButton">Buy Tickets</button>
+
+    <!-- Check Total Pot Section -->
+    <h2>Check Total Pot</h2>
+    <button id="checkPotButton">Check Total Pot</button>
+    <div id="totalPot"></div>
+
+    <script>
         console.log("Happy Lottery script loaded successfully");  // Log for debugging
 
         let provider;
@@ -15,7 +32,7 @@
         let Happy;
 
         // Your contract address on BSC Testnet
-        const contractAddress = "0xE4A753591DB790fce875DF16500b9667dbDb4f04"; 
+        const contractAddress = "0xE4A753591DB790fce875DF16500b9667dbDb4f04";
         console.log("Contract address:", contractAddress);
 
         // Contract ABI (methods needed for interaction)
@@ -26,7 +43,7 @@
         ];
 
         // Initialize MetaMask SDK
-        const MMSDK = new MetaMaskSDK({
+        const MMSDK = new MetaMaskSDK.MetaMaskSDK({
             dappMetadata: {
                 name: "Happy Lottery DApp",
                 url: window.location.href,
@@ -34,7 +51,6 @@
         });
 
         const ethereum = MMSDK.getProvider();  // Access provider via MetaMask SDK
-
         console.log("MetaMask provider detected:", ethereum);
 
         // Connect Wallet Function
@@ -107,24 +123,6 @@
         document.getElementById("connectWallet").addEventListener("click", connectWallet);
         document.getElementById("buyTicketsButton").addEventListener("click", buyTickets);
         document.getElementById("checkPotButton").addEventListener("click", checkTotalPot);
-
     </script>
-</head>
-<body>
-    <h1>Happy Lottery with MetaMask SDK</h1>
-
-    <!-- Connect Wallet Button -->
-    <button id="connectWallet">Connect Wallet</button>
-    <div id="walletAddress"></div>
-
-    <!-- Buy Tickets Section -->
-    <h2>Buy Tickets</h2>
-    <input type="number" id="ticketAmount" placeholder="Enter number of tickets">
-    <button id="buyTicketsButton">Buy Tickets</button>
-
-    <!-- Check Total Pot Section -->
-    <h2>Check Total Pot</h2>
-    <button id="checkPotButton">Check Total Pot</button>
-    <div id="totalPot"></div>
 </body>
 </html>
