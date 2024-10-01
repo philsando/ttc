@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Lottery</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.0/dist/ethers.min.js"></script>
+</head>
+<body>
+    <h1>Enhanced Lottery</h1>
+
+    <!-- Connect Wallet Button -->
+    <button id="connectWallet">Connect Wallet</button>
+    <div id="walletAddress"></div>
+
+    <!-- Buy Tickets Section -->
+    <h2>Buy Tickets</h2>
+    <input type="number" id="ticketAmount" placeholder="Enter number of tickets">
+    <button id="buyTicketsButton">Buy Tickets</button>
+
+    <!-- Check Total Pot Section -->
+    <h2>Check Total Pot</h2>
+    <button id="checkPotButton">Check Total Pot</button>
+    <div id="totalPot"></div>
+
+    <script>
+        let provider;
+        let signer;
+        let EnhancedLottery;
+
+        // Your contract address on BSC Testnet
+        const contractAddress = "0xE4A753591DB790fce875DF16500b9667dbDb4f04"; 
+
+        // Contract ABI (only including methods needed for interaction)
+        const abi = [
+            "function buyTickets(uint256 _numberOfTickets) public",
+            "function totalPot(uint256 lotteryId) public view returns (uint256)",
+            "function lotteryId() public view returns (uint256)"
+        ];
+
+        // Connect Wallet Function
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    await provider.send("eth_requestAccounts", []); // Request wallet connection
+                    signer = provider.getSigner();
+                    const walletAddress = await signer.getAddress();
+                    document.getElementById("walletAddress").innerText = "Connected: " + walletAddress;
+                    console.log("Wallet connected:", walletAddress);
+
+                    // Initialize contract instance
+                    EnhancedLottery = new ethers.Contract(contractAddress, abi, signer);
+                } catch (error) {
+                    console.error("Error connecting wallet:", error);
+                }
+            } else {
+                alert("Please install MetaMask to use this app.");
+            }
+        }
+
+        // Buy Tickets Function
+        async function buyTickets() {
+            if (!signer || !EnhancedLottery) {
+                alert("Please connect your wallet first.");
+                return;
+            }
+
+            const ticketAmount = document.getElementById("ticketAmount").value;
+            if (!ticketAmount || ticketAmount <= 0) {
+                alert("Please enter a valid number of tickets.");
+                return;
+            }
+
+            try {
+                const tx = await EnhancedLottery.buyTickets(ticketAmount);
+                await tx.wait(); // Wait for transaction to be confirmed
+                alert("Tickets purchased successfully!");
+                console.log("Tickets purchased:", ticketAmount);
+            } catch (error) {
+                console.error("Error purchasing tickets:", error);
+                alert("Failed to purchase tickets. Check the console for more details.");
+            }
+        }
+
+        // Check Total Pot Function
+        async function checkTotalPot() {
+            if (!provider || !EnhancedLottery) {
+                alert("Please connect your wallet first.");
+                return;
+            }
+
+            try {
+                const currentLotteryId = await EnhancedLottery.lotteryId(); // Get current lottery ID
+                const pot = await EnhancedLottery.totalPot(currentLotteryId); // Get total pot for the current lottery
+                document.getElementById("totalPot").innerText = "Total Pot: " + ethers.utils.formatEther(pot) + " TTC";
+                console.log("Total Pot for Lottery ID", currentLotteryId, ":", ethers.utils.formatEther(pot));
+            } catch (error) {
+                console.error("Error checking total pot:", error);
+                alert("Failed to retrieve the total pot. Check the console for more details.");
+            }
+        }
+
+        // Event Listeners
+        document.getElementById("connectWallet").addEventListener("click", connectWallet);
+        document.getElementById("buyTicketsButton").addEventListener("click", buyTickets);
+        document.getElementById("checkPotButton").addEventListener("click", checkTotalPot);
+    </script>
+</body>
+</html>
